@@ -48,6 +48,8 @@ print(paste0("Minimum Intron Read for Presence: ", minIntronRead))
 print(paste0("Minimum Gene TPM: ", minTPM))
 print(paste0("ArgumentFile: ", argumentFile))
 
+print(paste("Testing 1",Sys.time()))
+
 fracexpressiontable <- read.delim("table_frac_tot_cand",header=FALSE, stringsAsFactors = FALSE)
 fracexpressiontable <- as.data.frame(t(fracexpressiontable))
 fracexpressiontable <- data.frame(lapply(fracexpressiontable, as.character), stringsAsFactors=FALSE)
@@ -55,12 +57,16 @@ colnames(fracexpressiontable) <- as.character(fracexpressiontable[1,])
 fracexpressiontable <- fracexpressiontable[c(-1),]
 fracexpressiontable[-1] <- lapply(fracexpressiontable[-1], as.numeric)
 
+print(paste("Testing 2",Sys.time()))
+
 tpmexpressiontable <- read.delim("table_tpm_cand",header=FALSE, stringsAsFactors = FALSE)
 tpmexpressiontable <- as.data.frame(t(tpmexpressiontable))
 tpmexpressiontable<- data.frame(lapply(tpmexpressiontable, as.character), stringsAsFactors=FALSE)
 colnames(tpmexpressiontable) <- as.character(tpmexpressiontable[1,])
 tpmexpressiontable <- tpmexpressiontable[c(-1),]
 tpmexpressiontable[-1] <- lapply(tpmexpressiontable[-1], as.numeric)
+
+print(paste("Testing 3",Sys.time()))
 
 fracexpressiontable.m <- melt(fracexpressiontable, id.vars = c('TranscriptID'))
 tpmexpressiontable.m <- melt(tpmexpressiontable, id.vars = c('TranscriptID'))
@@ -72,6 +78,8 @@ if (!(identical(fracexpressiontable.m[,c(1)], tpmexpressiontable.m[,c(1)]))){
 colnames(fracexpressiontable.m)[3] <- "fractotal"
 fracexpressiontable.m$stringtieTPM <- tpmexpressiontable.m$value
 
+print(paste("Testing 4",Sys.time()))
+
 annotatedcufftranscripts <- annotatedcufftranscripts[order(annotatedcufftranscripts$uniqid),]
 annotatedcufftranscripts$duplicated <- duplicated(annotatedcufftranscripts$uniqid)
 
@@ -82,6 +90,9 @@ newtranscripts <- c()
 
 currenttranscript = "None"
 for (i in 1:nrow(annotatedcufftranscripts)){
+
+	print(paste("Testing 5",Sys.time()))
+
   uniqidrow = annotatedcufftranscripts$uniqid[i]
   transcriptrow = annotatedcufftranscripts$transcriptname[i]
   duplicatedsample = annotatedcufftranscripts$duplicated[i]
@@ -94,12 +105,16 @@ for (i in 1:nrow(annotatedcufftranscripts)){
   }
 }
 
+print(paste("Testing 6",Sys.time()))
+
 fracexpressiontable.m$variable <- as.character(fracexpressiontable.m$variable)
 j = 1
 for (oldtranscript in oldtranscripts){
   fracexpressiontable.m$variable[fracexpressiontable.m$variable==oldtranscript] <- newtranscripts[j]
   j=j+1
 }
+
+print(paste("Testing 7",Sys.time()))
 
 #Remove duplicate unique ids that could be tripping up the program. Witin the same sample they will be added together since they are pretty much the same just a downstream exon could be causing the difference.
 fracexpressiontable.m <- aggregate(. ~ TranscriptID + variable,fracexpressiontable.m,FUN = sum)
@@ -109,12 +124,16 @@ intronexpressiontable <- read.delim("table_i_all",header=FALSE, stringsAsFactors
 intronexpressiontable <- as.data.frame(t(intronexpressiontable))
 intronexpressiontable <- data.frame(lapply(intronexpressiontable, as.character), stringsAsFactors=FALSE)
 
+print(paste("Testing 7",Sys.time()))
+
 intronlabels <- paste(intronexpressiontable[1,2:ncol(intronexpressiontable)], intronexpressiontable[2,2:ncol(intronexpressiontable)], intronexpressiontable[3,2:ncol(intronexpressiontable)], intronexpressiontable[4,2:ncol(intronexpressiontable)], sep = "_")
 intronlabels <- c("TranscriptID",intronlabels)
 
 colnames(intronexpressiontable) <- intronlabels
 
 intronexpressiontable <- intronexpressiontable[c(-1,-2,-3,-4),]
+
+print(paste("Testing 8",Sys.time()))
 
 intronexpressiontable[-1] <- lapply(intronexpressiontable[-1], as.numeric)
 
@@ -123,6 +142,8 @@ intronexpressiontable.m <- melt(intronexpressiontable, id.vars = c('TranscriptID
 annotatedcufftranscripts$intronname <- paste(annotatedcufftranscripts$chrTE,annotatedcufftranscripts$strand,annotatedcufftranscripts$intronjunstart,annotatedcufftranscripts$intronjunend, sep = "_")
 
 indexfileintron1 <- match(fracexpressiontable.m$variable, annotatedcufftranscripts$transcriptname)
+
+print(paste("Testing 9",Sys.time()))
 
 fracexpressiontable.m$intronlabel <- annotatedcufftranscripts$intronname[indexfileintron1]
 
@@ -133,12 +154,16 @@ indexfileintron <- match(fracexpressiontable.m$fileintronlabel, intronexpression
 
 fracexpressiontable.m$intronread <- intronexpressiontable.m$value[indexfileintron]
 
+print(paste("Testing 10",Sys.time()))
+
 fracexpressiontable.m.exp.t <- fracexpressiontable.m[fracexpressiontable.m$stringtieTPM >= minTPM & fracexpressiontable.m$intronread >= minIntronRead & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), ]
 fracexpressiontable.m.exp.n <- fracexpressiontable.m[fracexpressiontable.m$stringtieTPM >= minTPM & fracexpressiontable.m$intronread >= minIntronRead & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), ]
 
 annotatedcufftranscripts$tumor_count <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) sum(fracexpressiontable.m.exp.t$variable==x[1]))
 
 annotatedcufftranscripts$normal_count <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) sum(fracexpressiontable.m.exp.n$variable==x[1]))
+
+print(paste("Testing 11",Sys.time()))
 
 annotatedcufftranscripts$tumor_fracmean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('fractotal')]))
 
@@ -150,6 +175,8 @@ annotatedcufftranscripts$normal_tpm_mean <- apply(annotatedcufftranscripts[,c('t
 
 annotatedcufftranscripts$tumor_intronjuncount_mean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('intronread')]))
 
+print(paste("Testing 12",Sys.time()))
+
 annotatedcufftranscripts$normal_intronjuncount_mean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('intronread')]))
 
 annotatedcufftranscripts <- annotatedcufftranscripts[annotatedcufftranscripts$duplicated == FALSE,]
@@ -159,6 +186,8 @@ numberNormalSamples <- length(unique(fracexpressiontable.m$TranscriptID[!grepl(p
 
 annotatedcufftranscripts$tumor_enrichment <- ((annotatedcufftranscripts$tumor_count)/numberTumorSamples)/((annotatedcufftranscripts$normal_count)/numberNormalSamples)
 
+print(paste("Testing 13",Sys.time()))
+
 TEreftable <- read.delim(repeatAnnotationFile, skip=1, header=FALSE, stringsAsFactors = FALSE)
 
 indexsubfams <- match(annotatedcufftranscripts$subfamTE, TEreftable$V1)
@@ -167,6 +196,8 @@ TEfamily_v1 <- TEreftable$V3[indexsubfams]
 
 annotatedcufftranscripts$classTE <- TEclass_v1
 annotatedcufftranscripts$familyTE <- TEfamily_v1
+
+print(paste("Testing 14",Sys.time()))
 
 
 #Final output tables for analysis
@@ -179,6 +210,8 @@ exportTable2$LocationTE <- paste0(exportTable2$exonintron1,'_',exportTable2$numb
 exportTable2$LocationTE[exportTable2$LocationTE == "None_None"] <- "Intergenic"
 exportTable2$SpliceTarget <- paste0(exportTable2$exonintron2,'_',exportTable2$number2)
 
+print(paste("Testing 15",Sys.time()))
+
 exportTable2 <- exportTable2[,c("transcriptname","subfamTE", "classTE", "familyTE","chrTE", "startTE", "endTE", "LocationTE", "gene2", "SpliceTarget","strand","tumor_count", "normal_count", "tumor_fracmean", "normal_fracmean", "tumor_tpm_mean", "normal_tpm_mean", "tumor_intronjuncount_mean", "normal_intronjuncount_mean", "tumor_enrichment")]
 
 colnames(exportTable2) <- c('Transcript Name','Subfam','Class',	'Family',	'Chr TE',	'Start TE',	'End TE',	'Location TE', 'Gene', 'Splice Target',	'Strand',	'Treatment Total',	'Normal Total', 'Fraction of Total Expression (Treatment)','Fraction of Total Expression (Normal)', 'Mean Transcript Expression (Treatment)','Mean Transcript Expression (Normal)','Mean Intron Read Count (Treatment)','Mean Intron Read Count (Normal)', 'Treatment Sample Enrichment')
@@ -190,6 +223,8 @@ colnames(exportTable2) <- c('Transcript Name','Subfam','Class',	'Family',	'Chr T
 #exportTable2 <- exportTable2[order(-exportTable2$`Treatment Total`),]
 #write.xlsx(exportTable2, "All TE-derived Alternative Isoforms Statistics.xlsx", row.names = FALSE)
 
+print(paste("Testing 16",Sys.time()))
+
 exportTable2 <- exportTable2[order(-exportTable2$`Treatment Total`),]
 write.csv(exportTable2, "All TE-derived Alternative Isoforms Statistics.csv", row.names = FALSE, quote = FALSE)
 
@@ -197,6 +232,8 @@ write.csv(exportTable2, "All TE-derived Alternative Isoforms Statistics.csv", ro
 exportAllStats <- fracexpressiontable.m[,c('TranscriptID', "variable", "stringtieTPM", "fractotal", "intronread")]
 colnames(exportAllStats) <- c('File', 'Transcript_Name', 'Transcript Expression (TPM)', 'Fraction of Total Gene Expression', 'Intron Read Count')
 write.table(exportAllStats, "allCandidateStatistics.tsv", sep = "\t", quote = FALSE, col.names = TRUE, row.names = FALSE)
+
+print(paste("Testing 17",Sys.time()))
 
 ##Create a refbed that can be visualized on the WashU Epigenome Browser
 getRefBed <- function(uniqid, structurestring, gene_name, transcript_name){
@@ -222,6 +259,8 @@ getRefBed <- function(uniqid, structurestring, gene_name, transcript_name){
   return(longvector)
 }
 
+print(paste("Testing 18",Sys.time()))
+
 refbedexamples <- apply(annotatedcufftranscripts[,c("uniqid", "transcoord", "gene2", "transcriptname")], 1, function(x) getRefBed(x[1],x[2], x[3], x[4]))
 refbedexamples <- unlist(refbedexamples)
 refbedexamples.m <- matrix(refbedexamples, nrow=12)
@@ -229,6 +268,8 @@ refbedexamples.m <- as.data.frame(t(refbedexamples.m), stringsAsFactors = FALSE)
 refbedexamples.m$V2 <- as.numeric(refbedexamples.m$V2)
 refbedexamples.m <- refbedexamples.m[order(refbedexamples.m$V1, refbedexamples.m$V2),]
 write.table(refbedexamples.m, "merged_transcripts_all.refBed", quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t")
+
+print(paste("Testing 19",Sys.time()))
 
 ##Final image file 
 save.image('Step11_FINAL.RData')

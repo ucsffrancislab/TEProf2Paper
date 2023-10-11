@@ -4,6 +4,8 @@ library('Xmisc')
 #This was created by Step 4 and has the data needed about each candidate.
 load("Step11_FINAL.RData")
 
+print(paste("Testing 1",Sys.time()))
+
 #Get the directory of the rnapipeline scripts
 initial.options <- commandArgs(trailingOnly = FALSE)
 file.arg.name <- "--file="
@@ -44,6 +46,8 @@ annotatedcufftranscripts.fil <- annotatedcufftranscripts
 #Function to call ORF using the Kozak method
 calORF <- function(newtranscript, oldtranscript, oldstartcodon){
   
+	print(paste("Testing 2",Sys.time()))
+
   #Testing Purposes
   #annotatedcufftranscripts.lin28b <- annotatedcufftranscripts[annotatedcufftranscripts$gene2 == 'NLRC4', ]
   #newtranscript <- as.character(annotatedcufftranscripts.lin28b$transcoord[1])
@@ -89,6 +93,8 @@ calORF <- function(newtranscript, oldtranscript, oldstartcodon){
     sequenceexons = paste0(sequenceexons, toString(getSeq(Hsapiens, chromosome, exons[i,1], exons[i,2])))
   }
   
+	print(paste("Testing 3",Sys.time()))
+
   if (strand == "-"){
     sequenceexons = toString(reverseComplement(DNAString(sequenceexons)))
     locationexons = rev(locationexons)
@@ -130,6 +136,8 @@ calORF <- function(newtranscript, oldtranscript, oldstartcodon){
     }
   }
   
+	print(paste("Testing 4",Sys.time()))
+
   if (strongstart != "None"){
     
     # This will generate a tuple list of all the dimensions of the exons of the old transcript (exons2) this also includes the introns
@@ -176,7 +184,8 @@ calORF <- function(newtranscript, oldtranscript, oldstartcodon){
       }
     }
     
-    
+	print(paste("Testing 5",Sys.time()))
+
     # Find the last intron/exon junction for NMD analysis
     if (length(oldtlist) > 2){
       if (strand == "-"){
@@ -211,6 +220,8 @@ calORF <- function(newtranscript, oldtranscript, oldstartcodon){
       }
     }
     
+	print(paste("Testing 6",Sys.time()))
+
     if (strand == "-"){
       sequenceexonsorig = toString(reverseComplement(DNAString(sequenceexonsorig)))
       locationexonsorig = rev(locationexonsorig)
@@ -307,6 +318,8 @@ calORF <- function(newtranscript, oldtranscript, oldstartcodon){
         labeltype = "None"
         nmdcall = "None"
         
+	print(paste("Testing 7",Sys.time()))
+
         
         disnew = firstmatch - startcodon
         disold = origlocmatch - indexoldstart
@@ -368,6 +381,8 @@ calORF <- function(newtranscript, oldtranscript, oldstartcodon){
           }
         }
         
+	print(paste("Testing 8",Sys.time()))
+
         aaCorrection = 0
         if (strongstart != "None"){
           # Truncating protein sequences for the chimeric ones. Adding 1
@@ -423,6 +438,8 @@ calORF <- function(newtranscript, oldtranscript, oldstartcodon){
           nmdcall = "No"
         }
         
+	print(paste("Testing 9",Sys.time()))
+
         framecorrection <- codonvec[origlocmatch]
         if(framecorrection == 1){
           correctionFactor = 0
@@ -470,6 +487,8 @@ calORF <- function(newtranscript, oldtranscript, oldstartcodon){
     returnframecall = "None"
   }
   
+	print(paste("Testing 10",Sys.time()))
+
   return(c(returnstrongstart, returnmatchloc, returnproteintrans, returnfullproteintrans, returnframe, returnlabeltype, returnnmddistance, returnnmdcall, returnproteinleft, returnframecall))
 }
 
@@ -492,6 +511,8 @@ colnames(annotatedcufftranscripts.fil) <- columnlabels
 
 #Now you have the protein sequence information from Kozak method
 annotatedcufftranscripts.fil$proteinseqfull2 <- apply(annotatedcufftranscripts.fil[,c('proteinseqfull','uniqid')],1, function(x) strsplit(x[1],"\\*")[[1]][1])
+
+	print(paste("Testing 11",Sys.time()))
 
 #This function will allow you to get the RNA sequence from coordinates of the transcript
 getSequenceFromCoords <- function(newtranscript){
@@ -539,6 +560,8 @@ getSequenceFromCoords <- function(newtranscript){
   return(sequenceexons)
 }
 
+	print(paste("Testing 12",Sys.time()))
+
 #clus <- makeCluster(8)
 
 #clusterEvalQ(clus, .libPaths( "/bar/nshah/R/x86_64-pc-linux-gnu-library/3.5"))
@@ -554,6 +577,8 @@ for (i in 1:nrow(annotatedcufftranscripts.fil)){
   fastaoutputvector <- c(fastaoutputvector, paste0(">",annotatedcufftranscripts.fil$uniqid[i]))
   fastaoutputvector <- c(fastaoutputvector,annotatedcufftranscripts.fil$rnasequence[i])
 }
+	print(paste("Testing 13",Sys.time()))
+
 
 fileConn<-file("candidates.fa")
 writeLines(fastaoutputvector, fileConn)

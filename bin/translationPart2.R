@@ -4,6 +4,8 @@ library('Xmisc')
 #This was created by Step 4 and has the data needed about each candidate.
 load("Step12.RData")
 
+print(paste("Testing 1",Sys.time()))
+
 #Get the directory of the rnapipeline scripts
 initial.options <- commandArgs(trailingOnly = FALSE)
 file.arg.name <- "--file="
@@ -35,6 +37,8 @@ library('reshape2')
 library('biomaRt')
 library(genomeName, character.only = TRUE)
 
+print(paste("Testing 2",Sys.time()))
+
 codingpotential_results <- read.delim('candidates_cpcout.fa', sep = "\t", stringsAsFactors = FALSE, header = TRUE)
 
 coding_label <- c()
@@ -47,6 +51,8 @@ annotatedcufftranscripts.fil$coding_label <- coding_label
 annotatedcufftranscripts.fil$start_location <- start_location
 
 #This is now the part of the code that will analyze the CPC2 longest openin reading frame results as well
+
+print(paste("Testing 3",Sys.time()))
 
 calORFCPC2 <- function(newtranscript, oldtranscript, oldstartcodon, strongstart, codingpotential){
   
@@ -87,6 +93,8 @@ calORFCPC2 <- function(newtranscript, oldtranscript, oldstartcodon, strongstart,
     sequenceexons = paste0(sequenceexons, toString(getSeq(Hsapiens, chromosome, exons[i,1], exons[i,2])))
   }
   
+print(paste("Testing 4",Sys.time()))
+
   if (strand == "-"){
     sequenceexons = toString(reverseComplement(DNAString(sequenceexons)))
     locationexons = rev(locationexons)
@@ -108,6 +116,8 @@ calORFCPC2 <- function(newtranscript, oldtranscript, oldstartcodon, strongstart,
     strongstart = "None"
   }
           
+print(paste("Testing 5",Sys.time()))
+
   
   if (strongstart != "None"){
     
@@ -154,6 +164,8 @@ calORFCPC2 <- function(newtranscript, oldtranscript, oldstartcodon, strongstart,
       }
     }
     
+print(paste("Testing 6",Sys.time()))
+
     
     # Find the last intron/exon junction for NMD analysis
     if (length(oldtlist) > 2){
@@ -199,6 +211,8 @@ calORFCPC2 <- function(newtranscript, oldtranscript, oldstartcodon, strongstart,
       lastjuncloc = match(lastjunc, locationexonsorig)
     }
     
+print(paste("Testing 7",Sys.time()))
+
     # Create a vector with frame informtion (1 being start of codon) to determine the frame of the new transcript
     
     indexoldstart = match(oldstart, locationexonsorig) - indexcorrection
@@ -241,6 +255,8 @@ calORFCPC2 <- function(newtranscript, oldtranscript, oldstartcodon, strongstart,
         }
       }
       
+print(paste("Testing 8",Sys.time()))
+
       if (firstmatch != "None"){
         # Calculate the frame
         if (frameinfo == 1){
@@ -277,6 +293,8 @@ calORFCPC2 <- function(newtranscript, oldtranscript, oldstartcodon, strongstart,
           framenew = "out-of-frame"
         }
         
+print(paste("Testing 9",Sys.time()))
+
         
         # Figure out if the protein is the same, the same truncated, chimeric same, chimeric truncated.
         
@@ -344,6 +362,8 @@ calORFCPC2 <- function(newtranscript, oldtranscript, oldstartcodon, strongstart,
           }
         }
         
+print(paste("Testing 10",Sys.time()))
+
         
         aaCorrection = 0
         if (strongstart != "None"){
@@ -376,6 +396,8 @@ calORFCPC2 <- function(newtranscript, oldtranscript, oldstartcodon, strongstart,
           }
         }
         
+print(paste("Testing 11",Sys.time()))
+
         endloc = gregexpr(pattern ='\\*',strongproteintrans)[[1]][1]
         if (endloc != -1){
           strongproteintrans2 = substring(strongproteintrans, 1, endloc - 1)
@@ -447,6 +469,8 @@ calORFCPC2 <- function(newtranscript, oldtranscript, oldstartcodon, strongstart,
     returnframecall = "None"
   }
   
+print(paste("Testing 12",Sys.time()))
+
   return(c(returnstrongstart, returnmatchloc, returnproteintrans, returnfullproteintrans, returnframe, returnlabeltype, returnnmddistance, returnnmdcall, returnproteinleft, returnframecall))
 }
 
@@ -463,6 +487,8 @@ colnames(annotatedcufftranscripts.fil) <- columnlabels
 annotatedcufftranscripts.fil$cpc2_proteinseqfull2 <- apply(annotatedcufftranscripts.fil[,c('cpc2_proteinseqfull','uniqid')],1, function(x) strsplit(x[1],"\\*")[[1]][1])
 
 #Adjusting the labels for new definitions. 
+
+print(paste("Testing 13",Sys.time()))
 
 newLabelsKozak <- apply(annotatedcufftranscripts.fil[,c("strongstartindex", "matchbetweenindex", "type", "proteinseqfull2")],1, function(x){
   if (x[3] == "chimeric normal" | x[3] == "chimeric truncated" | x[3] == "truncated" | x[3] == "normal" | x[3] == "None"){
@@ -488,6 +514,8 @@ newLabelsCPC2 <- apply(annotatedcufftranscripts.fil[,c("cpc2_strongstartindex", 
   }
 })
 
+print(paste("Testing 14",Sys.time()))
+
 annotatedcufftranscripts.fil$type_final <- newLabelsKozak 
 annotatedcufftranscripts.fil$cpc2_type_final <- newLabelsCPC2
 
@@ -509,6 +537,8 @@ annotatedcufftranscripts.fil.c <- annotatedcufftranscripts.fil
 
 fastaoutputvector <- c()
 
+print(paste("Testing 15",Sys.time()))
+
 for (i in 1:nrow(annotatedcufftranscripts.fil.c)){
   if (annotatedcufftranscripts.fil.c$samecall[i] == "Yes" & annotatedcufftranscripts.fil.c$type[i] %in% allowedtypes){
      fastaoutputvector <- c(fastaoutputvector, paste0(">tr|",annotatedcufftranscripts.fil.c$uniqid[i],"_both|",annotatedcufftranscripts.fil.c$uniqid[i],"_HUMAN_both ",annotatedcufftranscripts.fil.c$uniqid[i],"_HUMAN_both OS=Homo sapiens OX=9606 GN=",annotatedcufftranscripts.fil.c$gene2[i]))
@@ -525,6 +555,8 @@ for (i in 1:nrow(annotatedcufftranscripts.fil.c)){
       }
   }
 }
+
+print(paste("Testing 16",Sys.time()))
 
 fileConn<-file("candidates_proteinseq.fa")
 writeLines(fastaoutputvector, fileConn)
