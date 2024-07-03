@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 # programmer : nshah using code from dli
 # usage: To be used in order to create a dictionary of genecode transcripts, exons, and introns. This can be quickly accessed in future programs
 import sys

@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 # programmer : nshah
 # usage: To be used to process annotation file in order to get statistics
 

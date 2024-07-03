@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 # programmer : nshah 
 # usage: To be used in order to annotate a GTF file for presence of transcripts that begin in transposable elements.
 # argument structure: gtfAnnotator.py <gtffile> <argumentfile.txt>

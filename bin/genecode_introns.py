@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 # programmer : nshah using code from dli
 # usage: To be used in order to extract all the introns in gencode to use for further analysis
 import sys

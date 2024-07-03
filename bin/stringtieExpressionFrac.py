@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 # programmer : nshah 
 # usage: To be used to get summarized the transcript expression fraction and the TPM calculation into the pipeline
 
@@ -19,15 +19,15 @@ for line in filteredcontent:
 	fpkmline = line[-1]
 	subset = referencecontent[np.where(referencecontent[:,9] == geneline)]
 	fpkmlist = subset[:,-1].astype(np.float)
-	
+
 	#If there is no expression of gene then no division will be performed
 	if (max(fpkmlist) == 0.0):
 		print >> foutfractot, '\t'.join([transcriptidline] + [str(0.0)])
 		print >> fouttpm, '\t'.join([transcriptidline] + [str(0.0)])
-	
+
 	#If at least one isoform is expressed then the fraction and tpm will be expressed
 	else:
 		print >> foutfractot, '\t'.join([transcriptidline] + [str(float(fpkmline)/sum(fpkmlist))])
 		print >> fouttpm, '\t'.join([transcriptidline] + [str(float(fpkmline)*1000000.00/sumFPKM)])
-	
-	
+
+
