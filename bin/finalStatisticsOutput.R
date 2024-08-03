@@ -91,7 +91,7 @@ newtranscripts <- c()
 currenttranscript = "None"
 for (i in 1:nrow(annotatedcufftranscripts)){
 
-	print(paste("Testing 5",Sys.time()))
+#	print(paste("Testing 5",Sys.time()))
 
   uniqidrow = annotatedcufftranscripts$uniqid[i]
   transcriptrow = annotatedcufftranscripts$transcriptname[i]
@@ -124,7 +124,7 @@ intronexpressiontable <- read.delim("table_i_all",header=FALSE, stringsAsFactors
 intronexpressiontable <- as.data.frame(t(intronexpressiontable))
 intronexpressiontable <- data.frame(lapply(intronexpressiontable, as.character), stringsAsFactors=FALSE)
 
-print(paste("Testing 7",Sys.time()))
+print(paste("Testing 7b",Sys.time()))
 
 intronlabels <- paste(intronexpressiontable[1,2:ncol(intronexpressiontable)], intronexpressiontable[2,2:ncol(intronexpressiontable)], intronexpressiontable[3,2:ncol(intronexpressiontable)], intronexpressiontable[4,2:ncol(intronexpressiontable)], sep = "_")
 intronlabels <- c("TranscriptID",intronlabels)
@@ -167,22 +167,29 @@ print(paste("Testing 11",Sys.time()))
 
 annotatedcufftranscripts$tumor_fracmean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('fractotal')]))
 
+print(paste("Testing 11a",Sys.time()))
 annotatedcufftranscripts$normal_fracmean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('fractotal')]))
 
+print(paste("Testing 11b",Sys.time()))
 annotatedcufftranscripts$tumor_tpm_mean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('stringtieTPM')]))
 
+print(paste("Testing 11c",Sys.time()))
 annotatedcufftranscripts$normal_tpm_mean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('stringtieTPM')]))
 
+print(paste("Testing 11d",Sys.time()))
 annotatedcufftranscripts$tumor_intronjuncount_mean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('intronread')]))
 
 print(paste("Testing 12",Sys.time()))
 
 annotatedcufftranscripts$normal_intronjuncount_mean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('intronread')]))
 
+print(paste("Testing 12a",Sys.time()))
 annotatedcufftranscripts <- annotatedcufftranscripts[annotatedcufftranscripts$duplicated == FALSE,]
+print(paste("Testing 12b",Sys.time()))
 
 numberTumorSamples <- length(unique(fracexpressiontable.m$TranscriptID[grepl(parseTreatment, fracexpressiontable.m$TranscriptID)]))
 numberNormalSamples <- length(unique(fracexpressiontable.m$TranscriptID[!grepl(parseTreatment, fracexpressiontable.m$TranscriptID)]))
+print(paste("Testing 12c",Sys.time()))
 
 annotatedcufftranscripts$tumor_enrichment <- ((annotatedcufftranscripts$tumor_count)/numberTumorSamples)/((annotatedcufftranscripts$normal_count)/numberNormalSamples)
 
