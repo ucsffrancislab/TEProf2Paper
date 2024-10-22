@@ -165,23 +165,49 @@ annotatedcufftranscripts$normal_count <- apply(annotatedcufftranscripts[,c('tran
 
 print(paste("Testing 11",Sys.time()))
 
-annotatedcufftranscripts$tumor_fracmean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('fractotal')]))
+
+
+#	Parallelize these steps. For the Stanford data they each took about a day.
+#	[1] "Testing 11 2024-10-05 06:35:01.537322"
+#	[1] "Testing 11a 2024-10-06 06:03:48.518762"
+#	[1] "Testing 11b 2024-10-07 04:57:44.381496"
+#	[1] "Testing 11c 2024-10-08 04:25:20.0893"
+#	[1] "Testing 11d 2024-10-09 03:19:16.654808"
+#	[1] "Testing 12 2024-10-10 00:09:58.001431"
+#	[1] "Testing 12a 2024-10-10 16:41:45.420307"
+
+#	There appear to be a number of parallel / multithreaded applies
+
+#	replace the apply call with future_apply
+
+library('future.apply')
+
+
+#	How to set the number of threads?
+plan(multisession) ## Run in parallel on local computer
+
+annotatedcufftranscripts$tumor_fracmean <- future_apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('fractotal')]))
 
 print(paste("Testing 11a",Sys.time()))
-annotatedcufftranscripts$normal_fracmean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('fractotal')]))
+annotatedcufftranscripts$normal_fracmean <- future_apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('fractotal')]))
 
 print(paste("Testing 11b",Sys.time()))
-annotatedcufftranscripts$tumor_tpm_mean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('stringtieTPM')]))
+annotatedcufftranscripts$tumor_tpm_mean <- future_apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('stringtieTPM')]))
 
 print(paste("Testing 11c",Sys.time()))
-annotatedcufftranscripts$normal_tpm_mean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('stringtieTPM')]))
+annotatedcufftranscripts$normal_tpm_mean <- future_apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('stringtieTPM')]))
 
 print(paste("Testing 11d",Sys.time()))
-annotatedcufftranscripts$tumor_intronjuncount_mean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('intronread')]))
+annotatedcufftranscripts$tumor_intronjuncount_mean <- future_apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('intronread')]))
 
 print(paste("Testing 12",Sys.time()))
+annotatedcufftranscripts$normal_intronjuncount_mean <- future_apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('intronread')]))
 
-annotatedcufftranscripts$normal_intronjuncount_mean <- apply(annotatedcufftranscripts[,c('transcriptname','gene2')],1,function(x) mean(fracexpressiontable.m[fracexpressiontable.m$variable==x[1] & !grepl(parseTreatment,fracexpressiontable.m$TranscriptID), c('intronread')]))
+
+
+
+
+
 
 print(paste("Testing 12a",Sys.time()))
 annotatedcufftranscripts <- annotatedcufftranscripts[annotatedcufftranscripts$duplicated == FALSE,]
